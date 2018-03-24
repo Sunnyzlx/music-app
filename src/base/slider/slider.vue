@@ -51,8 +51,8 @@ export default {
       this.slider.refresh()
     })
   },
-  beforeDestroy() {
-    this.slide.disable()
+  beforeDestroy: function () {
+    this.slider.disable()
     clearTimeout(this.timer)
   },
   methods: {
