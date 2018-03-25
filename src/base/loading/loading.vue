@@ -1,0 +1,29 @@
+<template lang="pug">
+  div.loading
+    img(width="24",height="24",src="./loading.gif")
+    p.desc {{title}}
+</template>
+
+<script type="text/ecmascript-6">
+export default {
+  name: 'loading',
+  props: {
+    title: {
+      type: String,
+      default: '正在载入.......'
+    }
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '~@/common/stylus/variable'
+
+.loading
+  width 100%
+  text-align center
+  .desc
+    line-height 20px
+    font-size $font-size-small
+    color $color-text-l
+</style>

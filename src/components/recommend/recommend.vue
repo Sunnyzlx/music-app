@@ -16,11 +16,14 @@
               div.text
                 h2.name(v-html="item.creator.name")
                 p.desc(v-html="item.dissname")
+      div.loading-container(v-show="!discList.length")
+        loading
 </template>
 
 <script type="text/ecmascript-6">
 import Scroll from '@/base/scroll/scroll'
 import Slider from '@/base/slider/slider'
+import Loading from '@/base/loading/loading'
 import { getRecommend, getDiscList } from '@/api/recommend.js'
 import { ERR_OK } from '@/api/config.js'
 
@@ -60,7 +63,8 @@ export default {
   },
   components: {
     Slider,
-    Scroll
+    Scroll,
+    Loading
   }
 }
 </script>
