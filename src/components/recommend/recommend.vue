@@ -12,7 +12,7 @@
           ul
             li.item(v-for="item in discList")
               div.icon
-                img(width="60", height="60", :src="item.imgurl")
+                img(width="60", height="60", v-lazy="item.imgurl")
               div.text
                 h2.name(v-html="item.creator.name")
                 p.desc(v-html="item.dissname")
