@@ -1,29 +1,40 @@
 <template lang="pug">
   div.recommend
-    div.recommend-content
-      div.slider-wrapper(v-if="recommends.length")
-        slider
-          div(v-for="item in recommends")
-            a(:href="item.linkUrl")
-              img(:src="item.picUrl")
-      div.recommend-list
-        h1.list-title 热门歌单推荐
+    scroll.recommend-content(:data="discList",ref="scroll")
+      div
+        div.slider-wrapper(v-if="recommends.length")
+          slider
+            div(v-for="item in recommends")
+              a(:href="item.linkUrl")
+                img(:src="item.picUrl",@load="loadImage")
+        div.recommend-list
+          h1.list-title 热门歌单推荐
+          ul
+            li.item(v-for="item in discList")
+              div.icon
+                img(width="60", height="60", :src="item.imgurl")
+              div.text
+                h2.name(v-html="item.creator.name")
+                p.desc(v-html="item.dissname")
 </template>
 
 <script type="text/ecmascript-6">
+import Scroll from '@/base/scroll/scroll'
 import Slider from '@/base/slider/slider'
-import { getRecommend } from '@/api/recommend.js'
+import { getRecommend, getDiscList } from '@/api/recommend.js'
 import { ERR_OK } from '@/api/config.js'
 
 export default {
   name: 'recommend',
   data () {
     return {
-      recommends: []
+      recommends: [],
+      discList: []
     }
   },
   created: function () {
     this._getRecommend()
+    this._getDiscList()
   },
   methods: {
     _getRecommend: function () {
@@ -32,10 +43,24 @@ export default {
           this.recommends = res.data.slider
         }
       })
+    },
+    _getDiscList: function () {
+      getDiscList().then((res) => {
+        if (res.code === ERR_OK) {
+          this.discList = res.data.list
+        }
+      })
+    },
+    loadImage: function () {
+      if (!this.checkLoaded) {
+        this.$refs.scroll.refresh()
+        this.checkLoaded = true
+      }
     }
   },
   components: {
-    Slider
+    Slider,
+    Scroll
   }
 }
 </script>
