@@ -10,19 +10,26 @@
     div.list-shortcut(@touchstart="onShortcutTouchStart($event)",@touchmove.stop.prevent="onShortcutTouchMove($event)")
       ul
         li.item(:class="{'current': currentIndex === index}",v-for="(item, index) in shortcutList", :data-index="index") {{item}}
+    div.list-fixed(v-show="fixedTitle",ref='fixed')
+      h1.fixed-title {{fixedTitle}}
+    div.loading-container(v-show="!data.length")
+      loading
 </template>
 
 <script type="text/ecmascript-6">
 import Scroll from '@/base/scroll/scroll'
 import { getData } from '@/common/js/dom'
+import Loading from '@/base/loading/loading'
 const ANCHOR_HEIGHT = 18
+const TITLE_HEIGHT = 30
 
 export default {
   name: 'listview',
   data () {
     return {
       scrollY: -1,
-      currentIndex: 0
+      currentIndex: 0,
+      diff: -1
     }
   },
   props: {
@@ -42,6 +49,12 @@ export default {
       return this.data.map((group) => {
         return group.title.substring(0, 1)
       })
+    },
+    fixedTitle: function () {
+      if (this.scrollY > 0) {
+        return
+      }
+      return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
     }
   },
   methods: {
@@ -87,7 +100,8 @@ export default {
     }
   },
   components: {
-    Scroll
+    Scroll,
+    Loading
   },
   watch: {
     data: function () {
@@ -108,11 +122,20 @@ export default {
         let height2 = listHeight[i + 1]
         if (-newY >= height1 && -newY < height2) {
           this.currentIndex = i
+          this.diff = height2 + newY
           return
         }
       }
       // 当滚动到底部，且-newY大于最后一个元素的上限
       this.currentIndex = listHeight.length - 2
+    },
+    diff: function (newVal) {
+      let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+      if (this.fixedTop === fixedTop) {
+        return
+      }
+      this.fixedTop = fixedTop
+      this.$refs.fixed.style.transform = `translate3d(0, ${fixedTop}px, 0)`
     }
   }
 }
