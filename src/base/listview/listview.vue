@@ -4,7 +4,7 @@
       li.list-group(v-for="group in data",ref="listGroup")
         h2.list-group-title {{group.title}}
         ul
-          li.list-group-item(v-for="item in group.items")
+          li.list-group-item(@click="selectItem(item)",v-for="item in group.items")
             img.avatar(v-lazy="item.avatar")
             span.name {{item.name}}
     div.list-shortcut(@touchstart="onShortcutTouchStart($event)",@touchmove.stop.prevent="onShortcutTouchMove($event)")
@@ -58,6 +58,9 @@ export default {
     }
   },
   methods: {
+    selectItem: function (item) {
+      this.$emit('select', item)
+    },
     onShortcutTouchStart: function (e) {
       let anchorIndex = getData(e.target, 'index')
       let firstTouch = e.touches[0]
