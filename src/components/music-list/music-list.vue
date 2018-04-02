@@ -12,7 +12,7 @@
     div.bg-layer(ref="layer")
     scroll.list(@scroll="scroll",:probe-type="probeType",:listen-scroll="listenScroll",:data="songs",ref="list")
       div.song-list-wrapper
-        song-list(:songs="songs")
+        song-list(:songs="songs", @select="selectItem")
       div.loading-container(v-show="!songs.length")
         loading
 </template>
@@ -21,6 +21,7 @@
 import Scroll from '@/base/scroll/scroll'
 import SongList from '@/base/song-list/song-list'
 import Loading from '@/base/loading/loading'
+import { mapActions } from 'vuex'
 
 // import { prefixStyle } from '@/common/js/dom'
 
@@ -68,7 +69,16 @@ export default {
     },
     back: function () {
       this.$router.back()
-    }
+    },
+    selectItem: function (item, index) {
+      this.selectPlay({
+        list: this.songs,
+        index: index
+      })
+    },
+    ...mapActions([
+      'selectPlay'
+    ])
   },
   watch: {
     scrollY: function (newY) {
