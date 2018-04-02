@@ -31,12 +31,12 @@
           div.operators
             div.icon.i-left
               i.icon-sequence
-            div.icon.i-left
-              i.icon-prev
-            div.icon.i-center
+            div.icon.i-left(:class="disabledCls")
+              i.icon-prev(@click="prev")
+            div.icon.i-center(:class="disabledCls")
               i(@click="togglePlaying",:class="playIcon")
-            div.icon.i-right
-              i.icon-next
+            div.icon.i-right(:class="disabledCls")
+              i.icon-next(@click="next")
             div.icon.i-right
               i.icon.icon-not-favorite
     transition(name="mini")
@@ -50,7 +50,7 @@
           i(@click.stop="togglePlaying",:class="miniIcon")
         div.control
           i.icon-playlist
-    audio(ref="audio",:src="currentSong.url")
+    audio(ref="audio",:src="currentSong.url",@canplay="ready",@error="error")
 </template>
 
 <script type="text/ecmascript-6">
@@ -59,6 +59,11 @@ import animations from 'create-keyframe-animation'
 
 export default {
   name: 'player',
+  data () {
+    return {
+      songReady: false
+    }
+  },
   computed: {
     playIcon: function () {
       return this.playing ? 'icon-pause' : 'icon-play'
@@ -69,11 +74,15 @@ export default {
     cdCls: function () {
       return this.playing ? 'play' : 'play pause'
     },
+    disabledCls: function () {
+      return this.songReady ? '' : 'disable'
+    },
     ...mapGetters([
       'fullScreen',
       'playList',
       'currentSong',
-      'playing'
+      'playing',
+      'currentIndex'
     ])
   },
   methods: {
@@ -116,7 +125,44 @@ export default {
       this.$refs.cdWrapper.style.transfrom = ''
     },
     togglePlaying: function () {
+      if (!this.songReady) {
+        return
+      }
       this.setPlayingState(!this.playing)
+    },
+    prev: function () {
+      if (!this.songReady) {
+        return
+      }
+      let index = this.currentIndex - 1
+      if (index === -1) {
+        index = this.playList.length - 1
+      }
+      this.setCurrentIndex(index)
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+      this.songReady = false
+    },
+    next: function () {
+      if (!this.songReady) {
+        return
+      }
+      let index = this.currentIndex + 1
+      if (index === this.playList.length) {
+        index = 0
+      }
+      this.setCurrentIndex(index)
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+      this.songReady = false
+    },
+    ready: function () {
+      this.songReady = true
+    },
+    error: function () {
+      this.songReady = true
     },
     _getPosAndScale: function () {
       const targetWidth = 40
@@ -142,7 +188,8 @@ export default {
     },
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
-      setPlayingState: 'SET_PLAYING_STATE'
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX'
     })
   },
   watch: {
