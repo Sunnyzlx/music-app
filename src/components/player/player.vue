@@ -25,9 +25,9 @@
             span.dot
             span.dot
           div.progress-wrapper
-            span.time.time-l
+            span.time.time-l {{format(currentTime)}}
             div.progress-bar-wrapper
-            span.time.time-r
+            span.time.time-r {{format(currentSong.duration)}}
           div.operators
             div.icon.i-left
               i.icon-sequence
@@ -50,7 +50,7 @@
           i(@click.stop="togglePlaying",:class="miniIcon")
         div.control
           i.icon-playlist
-    audio(ref="audio",:src="currentSong.url",@canplay="ready",@error="error")
+    audio(ref="audio",:src="currentSong.url",@canplay="ready",@error="error",@timeupdate="updataTime")
 </template>
 
 <script type="text/ecmascript-6">
@@ -61,7 +61,8 @@ export default {
   name: 'player',
   data () {
     return {
-      songReady: false
+      songReady: false,
+      currentTime: 0
     }
   },
   computed: {
@@ -163,6 +164,23 @@ export default {
     },
     error: function () {
       this.songReady = true
+    },
+    updataTime: function (e) {
+      this.currentTime = e.tatget.currentTime
+    },
+    format: function (interval) {
+      interval = interval | 0
+      const minutes = interval / 60 | 0
+      const seconds = this._pad(interval % 60)
+      return `${minutes}:${seconds}`
+    },
+    _pad: function (num, n = 2) {
+      let len = num.toString().length
+      if (len < n) {
+        num = '0' + num
+        len++
+      }
+      return num
     },
     _getPosAndScale: function () {
       const targetWidth = 40
