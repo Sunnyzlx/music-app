@@ -16,7 +16,7 @@
         div.middle
           div.middle-l
             div.cd-wrapper(ref="cdWrapper")
-              div.cd
+              div.cd(:class="cdCls")
                 img.image(:src="currentSong.image")
             div.playing-lyric-wrapper
               div.playing-lyric
@@ -34,7 +34,7 @@
             div.icon.i-left
               i.icon-prev
             div.icon.i-center
-              i.icon-play
+              i(@click="togglePlaying",:class="playIcon")
             div.icon.i-right
               i.icon-next
             div.icon.i-right
@@ -42,11 +42,12 @@
     transition(name="mini")
       div.mini-player(v-show="!fullScreen",@click="_setFullScreen")
         div.icon
-          img(width="40",height="40",:src="currentSong.image")
+          img(:class="cdCls",width="40",height="40",:src="currentSong.image")
         div.text
           h2.name(v-html="currentSong.name")
           p.desc(v-html="currentSong.singer")
         div.control
+          i(@click.stop="togglePlaying",:class="miniIcon")
         div.control
           i.icon-playlist
     audio(ref="audio",:src="currentSong.url")
@@ -59,10 +60,20 @@ import animations from 'create-keyframe-animation'
 export default {
   name: 'player',
   computed: {
+    playIcon: function () {
+      return this.playing ? 'icon-pause' : 'icon-play'
+    },
+    miniIcon: function () {
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+    },
+    cdCls: function () {
+      return this.playing ? 'play' : 'play pause'
+    },
     ...mapGetters([
       'fullScreen',
       'playList',
-      'currentSong'
+      'currentSong',
+      'playing'
     ])
   },
   methods: {
@@ -104,6 +115,9 @@ export default {
       this.$refs.cdWrapper.style.transtion = ''
       this.$refs.cdWrapper.style.transfrom = ''
     },
+    togglePlaying: function () {
+      this.setPlayingState(!this.playing)
+    },
     _getPosAndScale: function () {
       const targetWidth = 40
       const paddingLeft = 40
@@ -127,13 +141,20 @@ export default {
       this.setFullScreen(true)
     },
     ...mapMutations({
-      setFullScreen: 'SET_FULL_SCREEN'
+      setFullScreen: 'SET_FULL_SCREEN',
+      setPlayingState: 'SET_PLAYING_STATE'
     })
   },
   watch: {
     currentSong: function () {
       this.$nextTick(() => {
         return this.$refs.audio.play()
+      })
+    },
+    playing: function (newPlaying) {
+      const audio = this.$refs.audio
+      this.$nextTick(() => {
+        newPlaying ? audio.play() : audio.pause()
       })
     }
   }
