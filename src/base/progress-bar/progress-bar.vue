@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.progress-bar(ref="progressBar")
+  div.progress-bar(ref="progressBar", @click="progressClick($event)")
     div.bar-inner
       div.progress(ref="progress")
       div.progress-btn-wrapper(ref="progressBtn",
@@ -39,6 +39,11 @@ export default {
     },
     progressTouchEnd: function () {
       this.touch.initiated = false
+      this._triggerPercent()
+    },
+    progressClick: function (e) {
+      console.log(e)
+      this._offset(e.offsetX)
       this._triggerPercent()
     },
     _triggerPercent: function () {
