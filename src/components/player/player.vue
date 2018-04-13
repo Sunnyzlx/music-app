@@ -27,6 +27,7 @@
           div.progress-wrapper
             span.time.time-l {{format(currentTime)}}
             div.progress-bar-wrapper
+              ProgressBar(:percent="percent",@percentChange="onProgressBarChange")
             span.time.time-r {{format(currentSong.duration)}}
           div.operators
             div.icon.i-left
@@ -50,12 +51,13 @@
           i(@click.stop="togglePlaying",:class="miniIcon")
         div.control
           i.icon-playlist
-    audio(ref="audio",:src="currentSong.url",@canplay="ready",@error="error",@timeupdate="updataTime")
+    audio(ref="audio",:src="currentSong.url",@canplay="ready",@error="error",@timeupdate="updataTime($event)")
 </template>
 
 <script type="text/ecmascript-6">
 import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
+import ProgressBar from '@/base/progress-bar/progress-bar'
 
 export default {
   name: 'player',
@@ -77,6 +79,9 @@ export default {
     },
     disabledCls: function () {
       return this.songReady ? '' : 'disable'
+    },
+    percent: function () {
+      return this.currentTime / this.currentSong.duration
     },
     ...mapGetters([
       'fullScreen',
@@ -166,13 +171,19 @@ export default {
       this.songReady = true
     },
     updataTime: function (e) {
-      this.currentTime = e.tatget.currentTime
+      this.currentTime = e.target.currentTime
     },
     format: function (interval) {
       interval = interval | 0
       const minutes = interval / 60 | 0
       const seconds = this._pad(interval % 60)
       return `${minutes}:${seconds}`
+    },
+    onProgressBarChange: function (percent) {
+      this.$refs.audio.currentTime = this.currentSong.duration * percent
+      if (!this.playing) {
+        this.togglePlaying()
+      }
     },
     _pad: function (num, n = 2) {
       let len = num.toString().length
@@ -222,6 +233,9 @@ export default {
         newPlaying ? audio.play() : audio.pause()
       })
     }
+  },
+  components: {
+    ProgressBar
   }
 }
 </script>
