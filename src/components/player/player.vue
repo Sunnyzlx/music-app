@@ -30,8 +30,8 @@
               ProgressBar(:percent="percent",@percentChange="onProgressBarChange")
             span.time.time-r {{format(currentSong.duration)}}
           div.operators
-            div.icon.i-left
-              i.icon-sequence
+            div.icon.i-left(@click="changeMode")
+              i(:class="iconMode")
             div.icon.i-left(:class="disabledCls")
               i.icon-prev(@click="prev")
             div.icon.i-center(:class="disabledCls")
@@ -56,6 +56,7 @@
 </template>
 
 <script type="text/ecmascript-6">
+import { playMode } from '@/common/js/config'
 import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import ProgressBar from '@/base/progress-bar/progress-bar'
@@ -85,12 +86,16 @@ export default {
     percent: function () {
       return this.currentTime / this.currentSong.duration
     },
+    iconMode: function () {
+      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+    },
     ...mapGetters([
       'fullScreen',
       'playList',
       'currentSong',
       'playing',
-      'currentIndex'
+      'currentIndex',
+      'mode'
     ])
   },
   methods: {
@@ -187,6 +192,11 @@ export default {
         this.togglePlaying()
       }
     },
+    changeMode: function () {
+      const mode = (this.mode + 1) % 3
+      console.log(mode)
+      this.setPlayMode(mode)
+    },
     _pad: function (num, n = 2) {
       let len = num.toString().length
       if (len < n) {
@@ -220,7 +230,8 @@ export default {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE'
     })
   },
   watch: {
