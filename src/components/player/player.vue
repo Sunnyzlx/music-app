@@ -48,7 +48,8 @@
           h2.name(v-html="currentSong.name")
           p.desc(v-html="currentSong.singer")
         div.control
-          i(@click.stop="togglePlaying",:class="miniIcon")
+          progress-circle(:radius="32",:percent="percent")
+            i.icon-mini(@click.stop="togglePlaying",:class="miniIcon")
         div.control
           i.icon-playlist
     audio(ref="audio",:src="currentSong.url",@canplay="ready",@error="error",@timeupdate="updataTime($event)")
@@ -58,6 +59,7 @@
 import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import ProgressBar from '@/base/progress-bar/progress-bar'
+import ProgressCircle from '@/base/progress-circle/progress-circle'
 
 export default {
   name: 'player',
@@ -235,7 +237,8 @@ export default {
     }
   },
   components: {
-    ProgressBar
+    ProgressBar,
+    ProgressCircle
   }
 }
 </script>
