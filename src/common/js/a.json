@@ -1,0 +1,20 @@
+{
+  "comm": {
+    "g_tk": 5381,
+    "uin": 0,
+    "format": "json",
+    "inCharset": "utf-8",
+    "outCharset": "utf-8",
+    "notice": 0,
+    "platform": "h5",
+    "needNewCode": 1
+  },
+  "data_id": {
+    "module": "track_info.UniformRuleCtrlServer",
+    "method": "GetTrackInfo",
+    "param": {
+      "ids": [213191472, 200397365, 213452935, 104674741, 5166863, 201040845, 213415158, 213433815, 213374391, 212542624, 1649946, 213023435, 213374395, 212670491, 7023937],
+      "types": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    }
+  }
+}

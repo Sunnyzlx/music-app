@@ -52,7 +52,7 @@
             i.icon-mini(@click.stop="togglePlaying",:class="miniIcon")
         div.control
           i.icon-playlist
-    audio(ref="audio",:src="currentSong.url",@canplay="ready",@error="error",@timeupdate="updataTime($event)")
+    audio(ref="audio",:src="currentSong.url",@canplay="ready",@error="error",@timeupdate="updataTime($event)",@ended="end")
 </template>
 
 <script type="text/ecmascript-6">
@@ -160,6 +160,7 @@ export default {
       this.songReady = false
     },
     next: function () {
+      console.log(this.songReady)
       if (!this.songReady) {
         return
       }
@@ -175,9 +176,11 @@ export default {
     },
     ready: function () {
       this.songReady = true
+      console.log('ready')
     },
     error: function () {
       this.songReady = true
+      console.log('error')
     },
     updataTime: function (e) {
       this.currentTime = e.target.currentTime
@@ -212,6 +215,17 @@ export default {
         return item.id === this.currentSong.id
       })
       this.setCurrentIndex(index)
+    },
+    end: function () {
+      if (this.mode === playMode.loop) {
+        this.loop()
+      } else {
+        this.next()
+      }
+    },
+    loop: function () {
+      this.$refs.audio.currentTime = 0
+      this.$refs.audio.play()
     },
     _pad: function (num, n = 2) {
       let len = num.toString().length
